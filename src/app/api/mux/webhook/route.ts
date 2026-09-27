@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+export async function POST(request: Request) { const event = await request.json() as any; if (event.type !== "video.asset.ready") return NextResponse.json({ ok: true }); const videoId = event.data?.passthrough; const playbackId = event.data?.playback_ids?.[0]?.id; if (videoId && playbackId) await prisma.video.update({ where: { id: videoId }, data: { muxAssetId: event.data.id, muxPlaybackId: playbackId, thumbnailUrl: `https://image.mux.com/${playbackId}/thumbnail.jpg?time=1`, status: "READY" } }); return NextResponse.json({ ok: true }); }

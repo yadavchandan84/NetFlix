@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum VideoStatus {
+  DRAFT
+  PROCESSING
+  READY
+  ERRORED
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  passwordHash String?
+  name String?
+  imageUrl String?
+  plan SubscriptionPlan @default(FREE)
+  role UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  watchHistory WatchHistory[]
+  watchlist Watchlist[]
+  reviews Review[]
+  profiles Profile[]
+}
+
+model Profile {
+  id String @id @default(cuid())
+  userId String
+  name String
+  avatarUrl String?
+  isKids Boolean @default(false)
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model Video {
+  id String @id @default(cuid())
+  title String
+  slug String @unique
+  description String @db.Text
+  thumbnailUrl String
+  muxPlaybackId String? @unique
+  muxAssetId String? @unique
+  muxUploadId String? @unique
+  status VideoStatus @default(DRAFT)
+  durationSeconds Int
+  maturityRating String?
+  releaseYear Int
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cast String[] @default([])
+  genres VideoGenre[]
+  watchHistory WatchHistory[]
+  watchlist Watchlist[]
+  reviews Review[]
+}
+
+model Genre {
+  id String @id @default(cuid())
+  name String @unique
+  slug String @unique
+  createdAt DateTime @default(now())
+  videos VideoGenre[]
+}
+
+model VideoGenre {
+  videoId String
+  genreId String
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+  @@id([videoId, genreId])
+}
+
+model WatchHistory {
+  id String @id @default(cuid())
+  userId String
+  videoId String
+  progressSeconds Int @default(0)
+  completed Boolean @default(false)
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  @@unique([userId, videoId])
+  @@index([userId, updatedAt])
+}
+
+model Watchlist {
+  id String @id @default(cuid())
+  userId String
+  videoId String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  @@unique([userId, videoId])
+  @@index([userId, createdAt])
+}
+
+model Review {
+  id String @id @default(cuid())
+  userId String
+  videoId String
+  rating Int
+  comment String? @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  @@unique([userId, videoId])
+  @@index([videoId, createdAt])
+}
