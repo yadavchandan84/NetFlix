@@ -356,3 +356,16 @@ This is a **portfolio / educational project** and is **not affiliated with Netfl
 - The "Netflix" name and branding are trademarks of Netflix, Inc., used here only for educational demonstration.
 
 Built with ❤️ using Next.js, React, Prisma, and Mux.
+
+## 👤 Author
+
+**Chandan Yadav**
+
+📧 [yadavchandan6103@gmail.com](mailto:yadavchandan6103@gmail.com)
+🔗 [GitHub](https://github.com/yadavchandan84) · [LinkedIn](https://www.linkedin.com/in/chandan-yadav-89aaa3253/)
+
+<div align="center">
+
+⭐ If you found this project useful, consider giving it a star.
+
+</div>
